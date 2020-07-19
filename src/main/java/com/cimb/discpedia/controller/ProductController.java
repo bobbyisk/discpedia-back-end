@@ -112,8 +112,8 @@ public class ProductController {
 				.body(resource);
 	}	
 	
-	@PutMapping("/{productId}/stockGudang/{stock}")
-	public String updateProduct(@RequestParam("file") MultipartFile file, @RequestParam("productData") String productString, @PathVariable int productId, @PathVariable int stock) throws JsonMappingException, JsonProcessingException {
+	@PutMapping("/{productId}/stockGudang/{stock}/{stockLama}")
+	public String updateProduct(@RequestParam("file") MultipartFile file, @RequestParam("productData") String productString, @PathVariable int productId, @PathVariable int stock, @PathVariable int stockLama) throws JsonMappingException, JsonProcessingException {
 		Date date = new Date();
 		Product findProduct = productRepo.findById(productId).get();
 		findProduct = new ObjectMapper().readValue(productString, Product.class);
@@ -136,7 +136,7 @@ public class ProductController {
 		}
 		
 		findProduct.setImg(fileDownloadUri);
-		findProduct.setStock_gudang(findProduct.getStock_gudang());
+		findProduct.setStock_gudang(findProduct.getStock_gudang() - (stock - stockLama));
 		productRepo.save(findProduct);
 		
 		return fileDownloadUri;
