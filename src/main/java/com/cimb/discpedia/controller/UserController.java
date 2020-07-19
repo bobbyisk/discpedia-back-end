@@ -47,7 +47,7 @@ public class UserController {
 			throw new RuntimeException("Username already exists!");
 		} else {
 			String encodedPassword = pwEncoder.encode(user.getPassword());
-			String verifyToken = pwEncoder.encode(user.getUsername() + user.getEmail());
+			String verifyToken = pwEncoder.encode(user.getUsername() + user.getEmail()).replace("/", "");
 			
 			user.setPassword(encodedPassword);
 			user.setVerified(false);
@@ -83,6 +83,11 @@ public class UserController {
 	@GetMapping("/username")
 	public Iterable<User> getUsername(@RequestParam String username) {
 		return userRepo.findUsername(username);
+	}
+	
+	@GetMapping("/email")
+	public Iterable<User> getEmail(@RequestParam String email) {
+		return userRepo.findEmail(email);
 	}
 	
 	@GetMapping("/{userId}")

@@ -28,8 +28,10 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import com.cimb.discpedia.dao.ProductRepo;
 import com.cimb.discpedia.dao.TransactionRepo;
 import com.cimb.discpedia.dao.UserRepo;
+import com.cimb.discpedia.entity.Product;
 import com.cimb.discpedia.entity.Transaction;
 import com.cimb.discpedia.entity.User;
 
@@ -44,6 +46,9 @@ public class TransactionController {
 
     @Autowired
     private TransactionRepo transactionRepo;
+    
+    @Autowired
+    private ProductRepo productRepo;
     
     @PostMapping("/{userId}")
     public Transaction inputTransaction(@PathVariable int userId, @RequestBody Transaction transaction) {
@@ -114,6 +119,22 @@ public class TransactionController {
     	findTransaction.setStatus(transaction.getStatus());
     	findTransaction.setBuyAccDate(transaction.getBuyAccDate());
     	findTransaction.setAlasan(transaction.getAlasan());
+    	
+    	if(findTransaction.getStatus().equals("success")){
+    		findTransaction.getTransactionDetails().forEach(val -> {
+    			if(val.getProduct().getTitle().contains("Paket")) {
+    				Product findProduct = productRepo.findById(6).get();
+    				findProduct.setStock(findProduct.getStock() - val.getQty());
+    				findProduct.setSold(findProduct.getSold() + val.getQty());
+    				Product findProduct2 = productRepo.findById(11).get();
+    				findProduct2.setStock(findProduct2.getStock() - val.getQty());
+    				findProduct2.setSold(findProduct2.getSold() + val.getQty());
+    			} 
+				val.getProduct().setStock(val.getProduct().getStock() - val.getQty());
+				val.getProduct().setSold(val.getProduct().getSold() + val.getQty());    				
+    			
+    		});
+    	}
     	
     	return transactionRepo.save(findTransaction);
 
